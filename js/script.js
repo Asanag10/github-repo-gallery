@@ -10,6 +10,12 @@ const reposSection = document.querySelector(".repos");
 // Global variable to select the section where individual repo data will appear
 const repoDataSection = document.querySelector(".repo-data");
 
+// Global variable to select the Back to Repo Gallery button
+const backToReposButton = document.querySelector(".view-repos");
+
+// Global variable to select the filter input (search box)
+const filterInput = document.querySelector(".filter-repos");
+
 // Global variable for GitHub username - replace with your actual GitHub username
 const username = "Asanag10";
 
@@ -79,6 +85,9 @@ async function fetchRepos() {
 
 // Function to display information about each repo
 function displayRepos(repos) {
+  // Show the filter input (search box)
+  filterInput.classList.remove("hide");
+  
   // Loop through each repo and create a list item
   repos.forEach(repo => {
     // Create a list item for each repo
@@ -154,7 +163,48 @@ function displayRepoInfo(repoInfo, languages) {
   // Show the repo-data section and hide the repos section
   repoDataSection.classList.remove("hide");
   reposSection.classList.add("hide");
+  
+  // Show the back button
+  backToReposButton.classList.remove("hide");
 }
+
+// Event listener for the Back to Repo Gallery button
+backToReposButton.addEventListener("click", function() {
+  // Show the repos section and hide the repo-data section
+  reposSection.classList.remove("hide");
+  repoDataSection.classList.add("hide");
+  
+  // Hide the back button
+  backToReposButton.classList.add("hide");
+});
+
+// Event listener for the search input (dynamic filtering)
+filterInput.addEventListener("input", function(e) {
+  // Get the search text value
+  const searchText = e.target.value;
+  console.log(searchText);
+  
+  // Select all repo elements
+  const repos = document.querySelectorAll(".repo");
+  
+  // Convert search text to lowercase for case-insensitive search
+  const searchLower = searchText.toLowerCase();
+  
+  // Loop through each repo
+  repos.forEach(function(repo) {
+    // Get the repo name (innerText of the h3 element)
+    const repoName = repo.querySelector("h3").innerText.toLowerCase();
+    
+    // Check if the repo name includes the search text
+    if (repoName.includes(searchLower)) {
+      // Show the repo if it matches
+      repo.classList.remove("hide");
+    } else {
+      // Hide the repo if it doesn't match
+      repo.classList.add("hide");
+    }
+  });
+});
 
 // Call the fetch function when the page loads
 fetchUserData();
