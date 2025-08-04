@@ -1,6 +1,9 @@
 // Global variable to select the overview div where profile information will appear
 const overview = document.querySelector(".overview");
 
+// Global variable to select the unordered list to display the repos list
+const reposList = document.querySelector(".repo-list");
+
 // Global variable for GitHub username - replace with your actual GitHub username
 const username = "Asanag10";
 
@@ -44,6 +47,44 @@ function displayUserInfo(data) {
   
   // Append the div to the overview element
   overview.append(userInfoDiv);
+  
+  // Call the function to fetch repos after displaying user info
+  fetchRepos();
+}
+
+// Async function to fetch user repositories from the API
+async function fetchRepos() {
+  try {
+    // Fetch repos from GitHub API with parameters for sorting and pagination
+    const response = await fetch(`https://api.github.com/users/${username}/repos?sort=updated&per_page=100`);
+    
+    // Resolve the JSON response
+    const repos = await response.json();
+    
+    // Log the response to console for inspection
+    console.log(repos);
+    
+    // Call the function to display repo information
+    displayRepos(repos);
+  } catch (error) {
+    console.error('Error fetching repos:', error);
+  }
+}
+
+// Function to display information about each repo
+function displayRepos(repos) {
+  // Loop through each repo and create a list item
+  repos.forEach(repo => {
+    // Create a list item for each repo
+    const listItem = document.createElement("li");
+    listItem.classList.add("repo");
+    
+    // Create an h3 element with the repo name
+    listItem.innerHTML = `<h3>${repo.name}</h3>`;
+    
+    // Append the list item to the repos list
+    reposList.append(listItem);
+  });
 }
 
 // Call the fetch function when the page loads
