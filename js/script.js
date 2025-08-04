@@ -4,6 +4,12 @@ const overview = document.querySelector(".overview");
 // Global variable to select the unordered list to display the repos list
 const reposList = document.querySelector(".repo-list");
 
+// Global variable to select the section where all repo information appears
+const reposSection = document.querySelector(".repos");
+
+// Global variable to select the section where individual repo data will appear
+const repoDataSection = document.querySelector(".repo-data");
+
 // Global variable for GitHub username - replace with your actual GitHub username
 const username = "Asanag10";
 
@@ -85,6 +91,69 @@ function displayRepos(repos) {
     // Append the list item to the repos list
     reposList.append(listItem);
   });
+}
+
+// Event listener for clicking on repo names
+reposList.addEventListener("click", function(e) {
+  // Check if the clicked element is an h3 (repo name)
+  if (e.target.matches("h3")) {
+    // Get the repo name from the clicked element
+    const repoName = e.target.innerText;
+    console.log(repoName);
+    
+    // Fetch and display specific repo information
+    getRepoInfo(repoName);
+  }
+});
+
+// Async function to get specific repo information
+async function getRepoInfo(repoName) {
+  try {
+    // Fetch specific repo information from GitHub API
+    const response = await fetch(`https://api.github.com/repos/${username}/${repoName}`);
+    const repoInfo = await response.json();
+    console.log(repoInfo);
+    
+    // Fetch languages for this repo
+    const fetchLanguages = await fetch(repoInfo.languages_url);
+    const languageData = await fetchLanguages.json();
+    console.log(languageData);
+    
+    // Create array of languages from the language data object
+    const languages = [];
+    for (const language in languageData) {
+      languages.push(language);
+    }
+    console.log(languages);
+    
+    // Display the specific repo information
+    displayRepoInfo(repoInfo, languages);
+  } catch (error) {
+    console.error('Error fetching repo info:', error);
+  }
+}
+
+// Function to display specific repo information
+function displayRepoInfo(repoInfo, languages) {
+  // Clear the repo-data section
+  repoDataSection.innerHTML = "";
+  
+  // Create a new div with repo information
+  const repoDiv = document.createElement("div");
+  repoDiv.innerHTML = `
+    <h3>Name: ${repoInfo.name}</h3>
+    <p>Description: ${repoInfo.description || 'No description available'}</p>
+    <p>Default Branch: ${repoInfo.default_branch}</p>
+    <p>Languages: ${languages.join(", ") || 'None'}</p>
+    <a class="visit" href="${repoInfo.html_url}" target="_blank" rel="noreferrer noopener">View Repo on GitHub!</a>
+  `;
+  
+  // Append the div to the repo-data section
+  repoDataSection.append(repoDiv);
+  
+  // Show the repo-data section and hide the repos section
+  repoDataSection.classList.remove("hide");
+  reposSection.classList.add("hide");
 }
 
 // Call the fetch function when the page loads
